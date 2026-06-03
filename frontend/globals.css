@@ -1,0 +1,326 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom Properties ─────────────────────────────────────── */
+:root {
+  --bg:              hsl(222 20% 7%);
+  --bg-elevated:     hsl(222 18% 10%);
+  --bg-surface:      hsl(222 17% 12%);
+  --bg-surface-2:    hsl(222 16% 15%);
+  --fg:              hsl(210 20% 95%);
+  --fg-muted:        hsl(215 12% 55%);
+  --fg-subtle:       hsl(215 10% 38%);
+  --border:          hsl(222 15% 16%);
+  --border-subtle:   hsl(222 13% 13%);
+  --primary:         hsl(217 91% 60%);
+  --primary-glow:    hsl(217 91% 60% / 0.25);
+  --success:         hsl(142 71% 45%);
+  --warning:         hsl(38 92% 50%);
+  --danger:          hsl(0 84% 60%);
+  --radius-card:     0.875rem;
+  --radius-btn:      0.625rem;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+html, body, #__next {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Subtle noise texture for depth */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, hsl(217 91% 60% / 0.08) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+/* ── Typography ────────────────────────────────────────────── */
+h1 {
+  @apply text-5xl md:text-7xl font-bold tracking-tight;
+  color: var(--fg);
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  @apply text-3xl md:text-5xl font-semibold;
+  color: var(--fg);
+  letter-spacing: -0.025em;
+}
+
+h3 {
+  @apply text-2xl md:text-3xl font-semibold;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--fg-muted);
+  @apply leading-relaxed;
+}
+
+/* Gradient headline utility */
+.text-gradient {
+  background: linear-gradient(135deg, var(--fg) 0%, hsl(217 91% 75%) 50%, hsl(217 91% 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Layout ────────────────────────────────────────────────── */
+.container {
+  @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8;
+}
+
+.section {
+  @apply py-24 md:py-32;
+}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  @apply p-6 transition-all duration-300;
+  box-shadow: 0 1px 3px hsl(0 0% 0% / 0.4), 0 1px 2px hsl(0 0% 0% / 0.3);
+}
+
+.card:hover {
+  border-color: hsl(222 15% 22%);
+  box-shadow: 0 8px 24px hsl(0 0% 0% / 0.5), 0 0 0 1px hsl(217 91% 60% / 0.06);
+  @apply -translate-y-0.5;
+}
+
+.card-glass {
+  background: hsl(222 18% 10% / 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid hsl(222 15% 20% / 0.6);
+  border-radius: var(--radius-card);
+  @apply p-6 transition-all duration-300;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+  @apply inline-flex items-center justify-center px-6 py-3 font-semibold transition-all duration-200 select-none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: hsl(0 0% 100%);
+  box-shadow: 0 0 20px -5px var(--primary-glow), inset 0 1px 0 hsl(0 0% 100% / 0.12);
+}
+
+.btn-primary:hover {
+  background: hsl(217 91% 65%);
+  box-shadow: 0 0 28px -4px var(--primary-glow), 0 4px 12px hsl(0 0% 0% / 0.3);
+  @apply -translate-y-px;
+}
+
+.btn-primary:active {
+  @apply translate-y-0;
+  box-shadow: 0 0 12px -4px var(--primary-glow);
+}
+
+.btn-secondary {
+  background: var(--bg-surface-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: hsl(222 15% 18%);
+  border-color: hsl(222 15% 22%);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--bg-surface);
+  border-color: hsl(222 15% 24%);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-muted);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-surface);
+  color: var(--fg);
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.navbar {
+  height: 3.75rem;
+  @apply sticky top-0 z-50;
+  background: hsl(222 20% 7% / 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Inputs ────────────────────────────────────────────────── */
+input, textarea, select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  border-radius: var(--radius-btn);
+  @apply px-4 py-2.5 transition-all duration-200 w-full;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: hsl(217 91% 60% / 0.5);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+  @apply outline-none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--fg-subtle);
+}
+
+/* ── Dividers ──────────────────────────────────────────────── */
+hr {
+  border-color: var(--border);
+}
+
+/* ── Badges ────────────────────────────────────────────────── */
+.badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full;
+}
+
+.badge-primary {
+  background: hsl(217 91% 60% / 0.15);
+  color: hsl(217 91% 75%);
+  border: 1px solid hsl(217 91% 60% / 0.25);
+}
+
+.badge-success {
+  background: hsl(142 71% 45% / 0.12);
+  color: hsl(142 71% 60%);
+  border: 1px solid hsl(142 71% 45% / 0.2);
+}
+
+.badge-warning {
+  background: hsl(38 92% 50% / 0.12);
+  color: hsl(38 92% 65%);
+  border: 1px solid hsl(38 92% 50% / 0.2);
+}
+
+.badge-danger {
+  background: hsl(0 84% 60% / 0.12);
+  color: hsl(0 84% 72%);
+  border: 1px solid hsl(0 84% 60% / 0.2);
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(222 15% 24%);
+}
+
+/* ── Focus & Selection ─────────────────────────────────────── */
+*:focus-visible {
+  @apply outline-none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary);
+}
+
+::selection {
+  background: hsl(217 91% 60% / 0.25);
+  color: var(--fg);
+}
+
+/* ── Links ─────────────────────────────────────────────────── */
+a {
+  color: inherit;
+  @apply transition-colors duration-200;
+}
+
+a:hover {
+  color: hsl(217 91% 72%);
+}
+
+/* ── Utilities ─────────────────────────────────────────────── */
+.glow {
+  box-shadow: 0 0 24px -6px var(--primary-glow);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px hsl(217 91% 60% / 0.5);
+}
+
+.border-subtle {
+  border-color: var(--border-subtle);
+}
+
+.surface {
+  background: var(--bg-surface);
+}
+
+.surface-elevated {
+  background: var(--bg-surface-2);
+}
+
+/* ── Skeleton / Loading ────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-surface-2) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 0.375rem;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Animations ────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 var(--primary-glow); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
