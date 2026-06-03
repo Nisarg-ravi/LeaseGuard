@@ -1,147 +1,214 @@
-// Upload and analysis page
-import React, { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { useRouter } from 'next/router';
-import toast from 'react-hot-toast';
-import { useUploadContract, useAnalyzeContract, useGetContract, useGetAnalysis } from '@/hooks/useApi';
+import React, { useCallback, useState } from 'react'
+import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import { useDropzone } from 'react-dropzone'
+import { useUploadContract, useAnalyzeContract, useGetContract, useGetAnalysis } from '@/hooks/useApi'
+import toast from 'react-hot-toast'
+import { ArrowUpTrayIcon, ExclamationCircleIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
 export default function AnalyzePage() {
-  const router = useRouter();
-  const [contractId, setContractId] = useState<number | null>(null);
-  const uploadMutation = useUploadContract();
-  const analyzeMutation = useAnalyzeContract();
-  const { data: contract } = useGetContract(contractId);
-  const { data: analysis } = useGetAnalysis(contractId);
+  const [contractId, setContractId] = useState<number | null>(null)
+  const uploadMutation = useUploadContract()
+  const analyzeMutation = useAnalyzeContract()
+  const { data: contract } = useGetContract(contractId)
+  const { data: analysis } = useGetAnalysis(contractId)
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) {
-      toast.error('Please upload a PDF file');
-      return;
+      toast.error('Please upload a PDF file')
+      return
     }
 
-    const file = acceptedFiles[0];
+    const file = acceptedFiles[0]
     if (file.type !== 'application/pdf') {
-      toast.error('Only PDF files are allowed');
-      return;
+      toast.error('Only PDF files are allowed')
+      return
     }
 
     try {
-      const result = await uploadMutation.mutateAsync(file);
-      setContractId(result.id);
-      toast.success('Contract uploaded successfully!');
-      
-      // Start analysis
-      await analyzeMutation.mutateAsync(result.id);
-      toast.success('Analysis started. This may take a minute...');
+      const result = await uploadMutation.mutateAsync(file)
+      setContractId(result.id)
+      toast.success('Contract uploaded successfully!')
+      await analyzeMutation.mutateAsync(result.id)
+      toast.success('Analysis complete!')
     } catch (error) {
-      toast.error('Failed to upload contract');
+      toast.error('Failed to upload contract')
     }
-  }, [uploadMutation, analyzeMutation]);
+  }, [uploadMutation, analyzeMutation])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Analyze Your Rental Contract</h1>
-        </div>
-      </div>
+    <div className="bg-background text-foreground min-h-screen">
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="container py-12">
         {!contractId ? (
           // Upload Section
-          <div className="bg-white rounded-lg shadow p-12">
+          <div className="max-w-2xl mx-auto">
+            <div className="mb-12">
+              <h1 className="mb-4">Analyze Your Rental Contract</h1>
+              <p className="text-lg text-muted-foreground">
+                Upload your PDF and get instant AI-powered risk assessment
+              </p>
+            </div>
+
             <div
               {...getRootProps()}
-              className={`border-4 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
-                isDragActive ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'
+              className={`card border-2 border-dashed cursor-pointer transition-all ${
+                isDragActive ? 'border-primary bg-primary/5' : 'border-border/50'
               }`}
             >
               <input {...getInputProps()} />
-              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-8h-8m8 0h8" />
-              </svg>
-              <p className="mt-4 text-lg font-medium text-gray-900">Drag & drop your PDF here</p>
-              <p className="text-gray-600">or click to select a file</p>
+              <div className="flex flex-col items-center justify-center py-16">
+                <ArrowUpTrayIcon className="w-12 h-12 text-primary mb-4 opacity-50" />
+                <p className="font-semibold text-lg mb-2">Drag and drop your PDF here</p>
+                <p className="text-muted-foreground">or click to select a file</p>
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-secondary/50 rounded-2xl border border-border/50">
+              <p className="text-sm text-muted-foreground">
+                💡 <strong>Tip:</strong> Make sure your file is a PDF. We support single and multi-page documents up to 10MB.
+              </p>
             </div>
           </div>
         ) : (
           // Results Section
-          <div className="space-y-6">
-            {uploadMutation.isPending && <div className="text-center text-indigo-600">Uploading...</div>}
-            {analyzeMutation.isPending && <div className="text-center text-indigo-600">Analyzing contract...</div>}
+          <div>
+            <div className="mb-12">
+              <Link href="/analyze" className="text-primary hover:opacity-70 transition text-sm mb-4 inline-block">
+                ← Analyze Another Contract
+              </Link>
+              <h1>Analysis Results</h1>
+            </div>
+
+            {(uploadMutation.isPending || analyzeMutation.isPending) && (
+              <div className="card text-center py-12 mb-8">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                <p className="text-muted-foreground">
+                  {uploadMutation.isPending ? 'Uploading...' : 'Analyzing contract...'}
+                </p>
+              </div>
+            )}
 
             {contract && analysis && (
-              <>
-                {/* Risk Summary */}
-                <div className="bg-white rounded-lg shadow p-8">
-                  <h2 className="text-2xl font-bold mb-6">Risk Assessment Summary</h2>
-                  <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-8">
+                {/* Risk Summary Card */}
+                <div className="card">
+                  <div className="grid md:grid-cols-3 gap-8">
                     <div>
-                      <p className="text-gray-600 text-sm">Overall Risk Score</p>
-                      <p className="text-4xl font-bold text-indigo-600">{analysis.overall_risk_score.toFixed(1)}</p>
-                      <p className="text-gray-600">out of 100</p>
+                      <p className="text-muted-foreground text-sm mb-2">Overall Risk Score</p>
+                      <p className="text-6xl font-bold text-primary">{analysis.overall_risk_score.toFixed(0)}</p>
+                      <p className="text-muted-foreground text-sm mt-2">out of 100</p>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>High Risk Clauses:</span>
-                        <span className="font-semibold">{analysis.high_risk_count}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Medium Risk Clauses:</span>
-                        <span className="font-semibold">{analysis.medium_risk_count}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Low Risk Clauses:</span>
-                        <span className="font-semibold">{analysis.low_risk_count}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Summary */}
-                <div className="bg-white rounded-lg shadow p-8">
-                  <h3 className="text-xl font-bold mb-4">Summary</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{analysis.summary}</p>
-                </div>
-
-                {/* Clauses */}
-                <div className="bg-white rounded-lg shadow p-8">
-                  <h3 className="text-xl font-bold mb-6">Clause Analysis</h3>
-                  <div className="space-y-4">
-                    {contract.clauses?.slice(0, 5).map((clause, idx) => (
-                      <div key={clause.id} className="border rounded-lg p-4 hover:shadow transition">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-semibold">Clause {clause.clause_number}</h4>
-                          <span className={`px-3 py-1 rounded text-sm font-medium ${
-                            clause.risk_level === 'high' ? 'bg-red-100 text-red-800' :
-                            clause.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {clause.risk_level.toUpperCase()}
-                          </span>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium">High Risk</span>
+                          <span className="text-danger font-bold">{analysis.high_risk_count}</span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-2">{clause.original_text.substring(0, 150)}...</p>
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-danger" style={{ width: `${Math.min(analysis.high_risk_count * 20, 100)}%` }}></div>
+                        </div>
                       </div>
-                    ))}
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium">Medium Risk</span>
+                          <span className="text-warning font-bold">{analysis.medium_risk_count}</span>
+                        </div>
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-warning" style={{ width: `${Math.min(analysis.medium_risk_count * 20, 100)}%` }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium">Low Risk</span>
+                          <span className="text-success font-bold">{analysis.low_risk_count}</span>
+                        </div>
+                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-success" style={{ width: `${Math.min(analysis.low_risk_count * 20, 100)}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <div className="text-center">
+                        <CheckCircleIcon className="w-12 h-12 text-success mx-auto mb-2" />
+                        <p className="font-semibold">Analysis Complete</p>
+                        <p className="text-sm text-muted-foreground">Ready to review</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Download Report */}
-                <div className="bg-indigo-600 text-white rounded-lg shadow p-8 text-center">
-                  <h3 className="text-xl font-bold mb-4">Ready to get the full report?</h3>
-                  <a href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/${contractId}`} 
-                     download className="inline-block bg-white text-indigo-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">
-                    Download PDF Report
-                  </a>
+                {/* Summary Section */}
+                <div className="card">
+                  <h2 className="text-2xl font-semibold mb-4">Summary</h2>
+                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{analysis.summary}</p>
                 </div>
-              </>
+
+                {/* Clauses Section */}
+                <div className="card">
+                  <h2 className="text-2xl font-semibold mb-6">Clause Breakdown</h2>
+                  <div className="space-y-4">
+                    {contract.clauses?.slice(0, 10).map((clause) => {
+                      const riskIcon = clause.risk_level === 'high' ? (
+                        <ExclamationCircleIcon className="w-5 h-5 text-danger" />
+                      ) : clause.risk_level === 'medium' ? (
+                        <ExclamationTriangleIcon className="w-5 h-5 text-warning" />
+                      ) : (
+                        <CheckCircleIcon className="w-5 h-5 text-success" />
+                      )
+
+                      return (
+                        <div key={clause.id} className="border border-border/50 rounded-2xl p-4 hover:-translate-y-1 transition-all">
+                          <div className="flex gap-4">
+                            <div className="flex-shrink-0 mt-1">{riskIcon}</div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-4">
+                                <div>
+                                  <h3 className="font-semibold mb-1">Clause {clause.clause_number}</h3>
+                                  <p className="text-sm text-muted-foreground">{clause.original_text.substring(0, 200)}...</p>
+                                </div>
+                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap flex-shrink-0 ${
+                                  clause.risk_level === 'high'
+                                    ? 'bg-danger/10 text-danger border border-danger/20'
+                                    : clause.risk_level === 'medium'
+                                    ? 'bg-warning/10 text-warning border border-warning/20'
+                                    : 'bg-success/10 text-success border border-success/20'
+                                }`}>
+                                  {clause.risk_level.charAt(0).toUpperCase() + clause.risk_level.slice(1)} Risk
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Download Section */}
+                <div className="card bg-primary/5 border border-primary/20">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Download Full Report</h3>
+                      <p className="text-muted-foreground">Get a detailed PDF report with all analysis and recommendations.</p>
+                    </div>
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/${contractId}`}
+                      download
+                      className="btn btn-primary flex-shrink-0"
+                    >
+                      Download PDF
+                    </a>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

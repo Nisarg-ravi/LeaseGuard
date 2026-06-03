@@ -14,9 +14,13 @@ LeaseGuard is an AI-powered tool that helps tenants understand rental contracts 
 
 ### Option 1: Docker Compose (Recommended)
 ```bash
-docker-compose -f docker/docker-compose.yml up
+# On modern Docker Desktop (incl. Windows), use the built-in command:
+docker compose -f docker/docker-compose.yml up
 # Open http://localhost:3000
 ```
+
+> Windows note: If you see "'docker-compose' is not recognized...", install Docker Desktop
+> (https://www.docker.com/get-started) or use the integrated `docker compose` command shown above.
 
 ### Option 2: Manual Setup
 
